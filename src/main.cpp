@@ -42,6 +42,7 @@ private:
 
   rclcpp::Subscription<event_camera_msgs::msg::EventPacket>::SharedPtr sub_;
   std::uint64_t t_last_;
+  std::uint64_t last_seqno_{0};
 
 public:
   EventCameraNode() : Node("event_camera_node") {
@@ -58,6 +59,10 @@ private:
   template <bool is_master>
   void
   callback(const event_camera_msgs::msg::EventPacket::ConstSharedPtr &msg) {
+    if (last_seqno_ != 0 && msg->seq != last_seqno_ + 1) {
+      RCLCPP_WARN(get_logger(), "seqno jump from %lu -> %lu", last_seqno_, msg->seq);
+    }
+    last_seqno_ = msg->seq;
     auto decoder = this->decoder_factory.getInstance(*msg);
     if (!decoder) {
       RCLCPP_WARN(get_logger(), "unknown encoding");

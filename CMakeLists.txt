@@ -29,11 +29,7 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(event_camera_node src/main.cpp)
-ament_target_dependencies(event_camera_node
-  rclcpp
-  event_camera_msgs
-  event_camera_codecs
-)
+target_link_libraries(event_camera_node rclcpp::rclcpp ${event_camera_msgs_TARGETS} ${event_camera_codecs_TARGETS})
 
 install(TARGETS event_camera_node
   DESTINATION lib/${PROJECT_NAME}
